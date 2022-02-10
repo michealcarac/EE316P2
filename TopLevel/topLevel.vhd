@@ -11,7 +11,7 @@ ENTITY Mode_Control_Logic is
 		KEY2 : IN std_logic;
 		KEY3 : IN std_logic;
 		
-		LCD_Data : OUT std_logic_vector(7 downto 0)
+		LCD_Data : OUT std_logic(7 downto 0)
 		
 		
 	);
@@ -22,8 +22,8 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 	TYPE operation_modes is (INIT, TEST, PAUSE, HZ60, HZ120, HZ1000);
 	SIGNAL operation_mode: operation_modes := INIT;
 	
-	SIGNAL clock 		: std_logic;
-	SIGNAL count_en 	: std_logic;
+	SIGNAL clock 		: std_logic_vector;
+	SIGNAL count_en 	: std_logic_vector;
 
 	COMPONENT I2C is
 	PORT(
@@ -60,13 +60,13 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 	);
 	END COMPONENT SRAM;
 	
-	COMPONENT ROM is
-	PORT(
-		address		: IN STD_LOGIC_VECTOR (7 DOWNTO 0);
-		clock		: IN STD_LOGIC  := '1';
-		q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+	component ROM is
+    port (
+        signal address	   : in  std_logic_vector(7 downto 0);
+        signal clock       : in  std_logic  := '1';
+		signal q 		   : out std_logic_vector(15 downto 0)
 	);
-	END COMPONENT ROM;
+    end component ROM;
 	
 	COMPONENT LCD is
 	PORT(
@@ -133,22 +133,44 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 
 		);
 	
-		inst_clk : clk_enabler	
-		GENERIC map(
-			cnt_max => 49999999)      --  1.0 Hz
-		port map(
-			clk_en => clk_1hz,
-			clock => clock
-		);
+	inst_clk : clk_enabler	
+	GENERIC map(
+		cnt_max => 49999999)      --  1.0 Hz
+	port map(
+		clk_en => clk_1hz,
+		clock => clock
+	);
 END ARCHITECTURE behavior;
 	
 PROCESS(clock)
 BEGIN
 	if rising_edge() then
 		case operation_mode is
+			when INIT =>
+                if clk_en_60ns = '1' AND ROM_done = '0' then -- This will run EVERY 60ns
+                    fstate <= init;
+                    if count_increment_60ns = x"FF" then
+                        ROM_done     <= '1';
+                        count_reset  <= '1';
+                        count_enable <= '0';
+                        fstate <= init;
+                    end if;
+                elsif ROM_done = '1' then
+					count_reset  <= '0';
+					count_enable <= '1';
+					SRAM_RW <= '1'; -- to read
+                    fstate <= OP_enabled;
+                else
+					SRAM_RW      				<= '0'; -- to write
+					--SRAM_addr(7 downto 0) 	<= count_increment_60ns;
+					count_reset <= '0';
+					count_enable<= '1';
+                    fstate <= init;
+                end if;
+			
 			when TEST => 
 				
-				LCD_Data = ;
+				selectMode = "00";
 				cnt_en 
 				
 				if KEY0 => 
@@ -210,34 +232,5 @@ BEGIN
 			-- do nothing
 		end case; 
 	end if;
-
-PROCESS(clock)
-	begin
-
-		LCD_Data = ; --Sends initializing to the LCD Screen
-
-		if operation_mode = INIT then
-		case sram_mode_reg is 
-			when start =>
-				cnt_reset <= '1';
-				sram_mode <= cnt_advn;
-			when cnt_advn =>
-				cnt_reset <= '0';
-				initStateCountEn <= '1';
-				sram_mode <= send_addr;
-			when send_addr =>
-				initStateCountEn <= '0';
-				sram_mode <= rw_data;
-			when rw_data =>
-				initWritePulse <= '1';
-				sram_mode <= wait1;
-			when wait1 =>
-				initWritePulse <= '0';
-				if sram_busy = '0' then
-					sram_mode <= cnt_advn;
-				end if;
-		end case;
-	end if;
-	
 
 
