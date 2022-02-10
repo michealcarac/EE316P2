@@ -9,7 +9,8 @@ ENTITY LCD_Transmitter IS
   PORT(
     clk       : IN     STD_LOGIC;                     --system clock
     reset_n   : IN     STD_LOGIC;
-    oData     : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0);  -- 8 bits, MSB is RS
+    data_i    : IN     STD_LOGIC_VECTOR(7 DOWNTO 0);  -- 8 bits
+    data_o    : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0);  -- 8 bits, MSB is RS
     RS        : OUT    STD_LOGIC;
     EN        : OUT    STD_LOGIC
     );                   
@@ -23,7 +24,7 @@ signal state      : state_type;                   --state machine
 signal data       : STD_LOGIC_VECTOR(8 DOWNTO 0); -- 9 bits, MSB is RS
 signal clk_cnt    : integer range 0 to cnt_max;
 signal clk_en     : STD_LOGIC;
-signal count 	  : unsigned(27 DOWNTO 0):=X"000000F";
+signal count 	    : unsigned(27 DOWNTO 0):=X"000000F";
 signal byteSel    : integer range 0 to 30:=0;
 signal RS_sig     : std_logic;
 signal EN_sig     : std_logic;
@@ -94,7 +95,7 @@ begin
     when start => 
         EN_sig <= '0';
         RS_sig <= data(8);
-        oData <= data(7 downto 0);
+        data_o <= data(7 downto 0);
         state <= enable;
     
     when enable =>
