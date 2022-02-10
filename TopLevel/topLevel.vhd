@@ -11,7 +11,7 @@ ENTITY Mode_Control_Logic is
 		KEY2 : IN std_logic;
 		KEY3 : IN std_logic;
 		
-		LCD_Data : OUT std_logic(7 downto 0);
+		LCD_Data : OUT std_logic_vector(7 downto 0)
 		
 		
 	);
@@ -22,8 +22,8 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 	TYPE operation_modes is (INIT, TEST, PAUSE, HZ60, HZ120, HZ1000);
 	SIGNAL operation_mode: operation_modes := INIT;
 	
-	SIGNAL clock 		: std_logic_vector;
-	SIGNAL count_en 	: std_logic_vector;
+	SIGNAL clock 		: std_logic;
+	SIGNAL count_en 	: std_logic;
 
 	COMPONENT I2C is
 	PORT(
@@ -43,20 +43,20 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 	
 	COMPONENT SRAM is
 	PORT(
-	   sram_io     : inout std_logic_vector(DataSize-1 downto 0); --DataSize bit data, To and From SRAM
-	   data_i      : in  std_logic_vector(DataSize-1 downto 0); --DataSize bit data, From User Logic
-	   addr_i      : in std_logic_vector(AddrSize-1 downto 0);  --AddrSize bit Address
-	   RW          : in std_logic; --Read/Write, 0 = write, 1 = read 
-	   RW_en       : in std_logic; --1 => enable read/write, pulse for 20ns then hold zero for desired time
-	   clk         : in std_logic; --Clk in (50Mhz)
-	   data_o      : out std_logic_vector(DataSize-1 downto 0); --DataSize bit data, To User Logic
-	   addr_o      : out std_logic_vector(AddrSize-1 downto 0); --AddrSize bit Address
-	   WE_n        : out std_logic; --Write Enable, Active Low
-	   OE_n        : out std_logic; --Output Enable, Active Low
-	   CE_n        : out std_logic; --Chip Enable, Active Low
-       LB_n        : out std_logic; --Lower-Byte Control, Active Low
-	   UB_n        : out std_logic; --Upper-Byte Control, Active Low
-	   busy        : out std_logic;  --Busy back to user logic
+		clk         : in std_logic; --Clk in (50Mhz)
+		sram_io     : inout std_logic_vector(DataSize-1 downto 0); --DataSize bit data, To and From SRAM
+		data_i      : in  std_logic_vector(DataSize-1 downto 0); --DataSize bit data, From User Logic
+		addr_i      : in std_logic_vector(AddrSize-1 downto 0);  --AddrSize bit Address
+		RW          : in std_logic; --Read/Write, 0 = write, 1 = read 
+		RW_en       : in std_logic; --1 => enable read/write, pulse for 20ns then hold zero for desired time
+		data_o      : out std_logic_vector(DataSize-1 downto 0); --DataSize bit data, To User Logic
+		addr_o      : out std_logic_vector(AddrSize-1 downto 0); --AddrSize bit Address
+		WE_n        : out std_logic; --Write Enable, Active Low
+		OE_n        : out std_logic; --Output Enable, Active Low
+		CE_n        : out std_logic; --Chip Enable, Active Low
+    	LB_n        : out std_logic; --Lower-Byte Control, Active Low
+		UB_n        : out std_logic; --Upper-Byte Control, Active Low
+		busy        : out std_logic;  --Busy back to user logic
 	);
 	END COMPONENT SRAM;
 	
@@ -66,7 +66,7 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 		clock		: IN STD_LOGIC  := '1';
 		q		: OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
 	);
-	END COMPONENT SRAM;
+	END COMPONENT ROM;
 	
 	COMPONENT LCD is
 	PORT(
@@ -87,21 +87,35 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 		address_out : out std_logic_vector(7 downto 0);
 		output : out std_logic
 	);
-	END COMPONENT  is
+	END COMPONENT PWM;
 	
-	SIGNAL 
-	
+	COMPONENT clk_enabler is
+	GENERIC (
+		CONSTANT cnt_max : integer := 49999999);      --  1.0 Hz		
+	PORT(
+		clock:		in std_logic;	 
+		clk_en: 	out std_logic
+	);
+	END COMPONENT clk_enabler;
+
+	SIGNAL sram_busy : std_logic := '0';
+	SIGNAL rom_address : std_logic_vector(7 downto 0);
+	SIGNAL data : std_logic_vector(15 downto 0);
+
 	BEGIN
 	inst_sram : SRAM
 		port map(
-			clock => clock
-			busy => sram _busy
+			clock => clock,
+			busy => sram_busy,
+			sram_io => sram_io,
 
 		);
 	
 	inst_rom : ROM
 		port map(
-
+			clock => clock,
+			address => rom_address,
+			q => data,
 		);
 		
 	inst_i2c : I2C
@@ -116,9 +130,16 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 		
 	inst_lcd : LCD
 		port map(
-		
+
 		);
 	
+		inst_clk : clk_enabler	
+		GENERIC map(
+			cnt_max => 49999999)      --  1.0 Hz
+		port map(
+			clk_en => clk_1hz,
+			clock => clock
+		);
 END ARCHITECTURE behavior;
 	
 PROCESS(clock)
