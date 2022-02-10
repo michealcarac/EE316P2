@@ -46,7 +46,7 @@ type machine is(start,write_data, busy_state);
 signal state     : machine;
 --signal busy_cnt  : integer range 0 to 4 := 0;   --Count the busy signals
 --signal busy_prev : std_logic; 				    --Hold previous Busy Signal 
-signal byteSel   : integer range 0 to 12 := 0;  --For issuing Data send
+signal byteSel   : integer range 0 to 10 := 0;  --For issuing Data send
 signal count     : unsigned(19 downto 0) := delay;
 signal addr_reg  : std_logic_vector(6 downto 0) := "1110001";
 signal data_reg  : std_logic_vector(7 downto 0) := x"00";
@@ -89,12 +89,10 @@ begin
             when 4       => data_reg <= X"FF";
             when 5       => data_reg <= X"77";
             when 6       => data_reg <= X"00";
-            when 7       => data_reg <= X"79";
-            when 8       => data_reg <= X"00";
-            when 9       => data_reg <= X"0"& data_i(15 downto 12);
-            when 10      => data_reg <= X"0"& data_i(11 downto 8);
-            when 11      => data_reg <= X"0"& data_i(7 downto 4);
-            when 12      => data_reg <= X"0"& data_i(3 downto 0);
+            when 7       => data_reg <= X"0"& data_i(15 downto 12);
+            when 8       => data_reg <= X"0"& data_i(11 downto 8);
+            when 9       => data_reg <= X"0"& data_i(7 downto 4);
+            when 10      => data_reg <= X"0"& data_i(3 downto 0);
             when others  => data_reg <= X"76";
         end case;
     end process;
@@ -124,11 +122,11 @@ begin
                             state   <= write_data;
                         end if;
                     when write_data =>
-                        if busy = '1' then
-                            if byteSel < 12 then
+                        if busy = '0' then
+                            if byteSel < 10 then
                                 byteSel <= byteSel + 1;
                             else
-                                byteSel <= 9;
+                                byteSel <= 7;
                                 state <= start;
                             end if;
                             state <= busy_state;  
@@ -137,7 +135,7 @@ begin
                         end if;
                         	
                     when busy_state =>
-                        if busy = '0' then
+                        if busy = '1' then
                             state <= write_data;
                         else
                             state <= busy_state;
