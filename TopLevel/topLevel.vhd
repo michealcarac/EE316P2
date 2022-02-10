@@ -54,7 +54,7 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 	   WE_n        : out std_logic; --Write Enable, Active Low
 	   OE_n        : out std_logic; --Output Enable, Active Low
 	   CE_n        : out std_logic; --Chip Enable, Active Low
-      LB_n        : out std_logic; --Lower-Byte Control, Active Low
+       LB_n        : out std_logic; --Lower-Byte Control, Active Low
 	   UB_n        : out std_logic; --Upper-Byte Control, Active Low
 	   busy        : out std_logic;  --Busy back to user logic
 	);
@@ -87,17 +87,21 @@ ARCHITECTURE behavior of Mode_Control_Logic is
 		address_out : out std_logic_vector(7 downto 0);
 		output : out std_logic
 	);
-	END COMPONENT PWM is
+	END COMPONENT  is
+	
+	SIGNAL 
 	
 	BEGIN
 	inst_sram : SRAM
 		port map(
-			
+			clock => clock
+			busy => sram _busy
+
 		);
 	
 	inst_rom : ROM
 		port map(
-		
+
 		);
 		
 	inst_i2c : I2C
@@ -186,8 +190,11 @@ BEGIN
 		end case; 
 	end if;
 
-PROCESS()
+PROCESS(clock)
 	begin
+
+		LCD_Data = ; --Sends initializing to the LCD Screen
+
 		if operation_mode = INIT then
 		case sram_mode_reg is 
 			when start =>
