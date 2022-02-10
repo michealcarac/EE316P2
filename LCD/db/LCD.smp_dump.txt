@@ -1,0 +1,6 @@
+
+State Machine - |DE2115|LCD_Transmitter:LCD|state
+Name state.repeat state.enable state.start 
+state.start 0 0 0 
+state.enable 0 1 1 
+state.repeat 1 0 1 
