@@ -3,19 +3,19 @@ TimeQuest Timing Analyzer Summary
 ------------------------------------------------------------
 
 Type  : Slow 1200mV 85C Model Setup 'CLOCK_50'
-Slack : -2.302
-TNS   : -25.413
+Slack : -2.289
+TNS   : -26.267
 
 Type  : Slow 1200mV 85C Model Setup 'LCD_Transmitter:LCD|clk_en'
-Slack : -1.527
-TNS   : -17.580
+Slack : -2.267
+TNS   : -27.707
 
 Type  : Slow 1200mV 85C Model Hold 'LCD_Transmitter:LCD|clk_en'
 Slack : 0.404
 TNS   : 0.000
 
 Type  : Slow 1200mV 85C Model Hold 'CLOCK_50'
-Slack : 0.655
+Slack : 0.654
 TNS   : 0.000
 
 Type  : Slow 1200mV 85C Model Minimum Pulse Width 'CLOCK_50'
@@ -24,22 +24,22 @@ TNS   : -24.845
 
 Type  : Slow 1200mV 85C Model Minimum Pulse Width 'LCD_Transmitter:LCD|clk_en'
 Slack : -1.285
-TNS   : -23.130
+TNS   : -24.415
 
 Type  : Slow 1200mV 0C Model Setup 'CLOCK_50'
-Slack : -2.034
-TNS   : -21.182
+Slack : -2.017
+TNS   : -22.031
 
 Type  : Slow 1200mV 0C Model Setup 'LCD_Transmitter:LCD|clk_en'
-Slack : -1.302
-TNS   : -14.316
+Slack : -1.960
+TNS   : -23.867
 
 Type  : Slow 1200mV 0C Model Hold 'LCD_Transmitter:LCD|clk_en'
-Slack : 0.356
+Slack : 0.355
 TNS   : 0.000
 
 Type  : Slow 1200mV 0C Model Hold 'CLOCK_50'
-Slack : 0.597
+Slack : 0.598
 TNS   : 0.000
 
 Type  : Slow 1200mV 0C Model Minimum Pulse Width 'CLOCK_50'
@@ -48,15 +48,15 @@ TNS   : -24.845
 
 Type  : Slow 1200mV 0C Model Minimum Pulse Width 'LCD_Transmitter:LCD|clk_en'
 Slack : -1.285
-TNS   : -23.130
+TNS   : -24.415
 
 Type  : Fast 1200mV 0C Model Setup 'CLOCK_50'
-Slack : -0.578
-TNS   : -4.058
+Slack : -0.572
+TNS   : -4.297
 
 Type  : Fast 1200mV 0C Model Setup 'LCD_Transmitter:LCD|clk_en'
-Slack : -0.210
-TNS   : -1.174
+Slack : -0.570
+TNS   : -5.548
 
 Type  : Fast 1200mV 0C Model Hold 'LCD_Transmitter:LCD|clk_en'
 Slack : 0.182
@@ -68,10 +68,10 @@ TNS   : 0.000
 
 Type  : Fast 1200mV 0C Model Minimum Pulse Width 'CLOCK_50'
 Slack : -3.000
-TNS   : -25.103
+TNS   : -25.026
 
 Type  : Fast 1200mV 0C Model Minimum Pulse Width 'LCD_Transmitter:LCD|clk_en'
 Slack : -1.000
-TNS   : -18.000
+TNS   : -19.000
 
 ------------------------------------------------------------

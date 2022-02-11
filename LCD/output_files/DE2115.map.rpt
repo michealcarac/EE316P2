@@ -1,5 +1,5 @@
 Analysis & Synthesis report for DE2115
-Tue Feb 08 16:16:47 2022
+Fri Feb 11 13:56:18 2022
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
 
 
@@ -16,8 +16,9 @@ Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Ver
   8. State Machine - |DE2115|LCD_Transmitter:LCD|state
   9. General Register Statistics
  10. Parameter Settings for User Entity Instance: LCD_Transmitter:LCD
- 11. Elapsed Time Per Partition
- 12. Analysis & Synthesis Messages
+ 11. Port Connectivity Checks: "LCD_Transmitter:LCD"
+ 12. Elapsed Time Per Partition
+ 13. Analysis & Synthesis Messages
 
 
 
@@ -43,15 +44,15 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                          ;
 +------------------------------------+--------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Tue Feb 08 16:16:47 2022            ;
+; Analysis & Synthesis Status        ; Successful - Fri Feb 11 13:56:18 2022            ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Full Version ;
 ; Revision Name                      ; DE2115                                           ;
 ; Top-level Entity Name              ; DE2115                                           ;
 ; Family                             ; Cyclone IV E                                     ;
-; Total logic elements               ; 65                                               ;
-;     Total combinational functions  ; 63                                               ;
-;     Dedicated logic registers      ; 35                                               ;
-; Total registers                    ; 35                                               ;
+; Total logic elements               ; 183                                              ;
+;     Total combinational functions  ; 181                                              ;
+;     Dedicated logic registers      ; 36                                               ;
+; Total registers                    ; 36                                               ;
 ; Total pins                         ; 155                                              ;
 ; Total virtual pins                 ; 0                                                ;
 ; Total memory bits                  ; 0                                                ;
@@ -174,34 +175,34 @@ applicable agreement for further details.
 +----------------------------------+-----------------+-----------------+------------------------------------------------------------------+---------+
 
 
-+--------------------------------------------------------------------------+
-; Analysis & Synthesis Resource Usage Summary                              ;
-+---------------------------------------------+----------------------------+
-; Resource                                    ; Usage                      ;
-+---------------------------------------------+----------------------------+
-; Estimated Total logic elements              ; 65                         ;
-;                                             ;                            ;
-; Total combinational functions               ; 63                         ;
-; Logic element usage by number of LUT inputs ;                            ;
-;     -- 4 input functions                    ; 22                         ;
-;     -- 3 input functions                    ; 6                          ;
-;     -- <=2 input functions                  ; 35                         ;
-;                                             ;                            ;
-; Logic elements by mode                      ;                            ;
-;     -- normal mode                          ; 44                         ;
-;     -- arithmetic mode                      ; 19                         ;
-;                                             ;                            ;
-; Total registers                             ; 35                         ;
-;     -- Dedicated logic registers            ; 35                         ;
-;     -- I/O registers                        ; 0                          ;
-;                                             ;                            ;
-; I/O pins                                    ; 155                        ;
-; Embedded Multiplier 9-bit elements          ; 0                          ;
-; Maximum fan-out node                        ; LCD_Transmitter:LCD|clk_en ;
-; Maximum fan-out                             ; 18                         ;
-; Total fan-out                               ; 474                        ;
-; Average fan-out                             ; 1.05                       ;
-+---------------------------------------------+----------------------------+
++------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary                                  ;
++---------------------------------------------+--------------------------------+
+; Resource                                    ; Usage                          ;
++---------------------------------------------+--------------------------------+
+; Estimated Total logic elements              ; 183                            ;
+;                                             ;                                ;
+; Total combinational functions               ; 181                            ;
+; Logic element usage by number of LUT inputs ;                                ;
+;     -- 4 input functions                    ; 110                            ;
+;     -- 3 input functions                    ; 23                             ;
+;     -- <=2 input functions                  ; 48                             ;
+;                                             ;                                ;
+; Logic elements by mode                      ;                                ;
+;     -- normal mode                          ; 161                            ;
+;     -- arithmetic mode                      ; 20                             ;
+;                                             ;                                ;
+; Total registers                             ; 36                             ;
+;     -- Dedicated logic registers            ; 36                             ;
+;     -- I/O registers                        ; 0                              ;
+;                                             ;                                ;
+; I/O pins                                    ; 155                            ;
+; Embedded Multiplier 9-bit elements          ; 0                              ;
+; Maximum fan-out node                        ; LCD_Transmitter:LCD|byteSel[0] ;
+; Maximum fan-out                             ; 50                             ;
+; Total fan-out                               ; 909                            ;
+; Average fan-out                             ; 1.59                           ;
++---------------------------------------------+--------------------------------+
 
 
 +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -209,8 +210,8 @@ applicable agreement for further details.
 +----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------+--------------+
 ; Compilation Hierarchy Node ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name         ; Library Name ;
 +----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------+--------------+
-; |DE2115                    ; 63 (1)            ; 35 (0)       ; 0           ; 0            ; 0       ; 0         ; 155  ; 0            ; |DE2115                     ; work         ;
-;    |LCD_Transmitter:LCD|   ; 62 (62)           ; 35 (35)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE2115|LCD_Transmitter:LCD ; work         ;
+; |DE2115                    ; 181 (1)           ; 36 (0)       ; 0           ; 0            ; 0       ; 0         ; 155  ; 0            ; |DE2115                     ; work         ;
+;    |LCD_Transmitter:LCD|   ; 180 (180)         ; 36 (36)      ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |DE2115|LCD_Transmitter:LCD ; work         ;
 +----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+------+--------------+-----------------------------+--------------+
 Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
 
@@ -232,12 +233,12 @@ Encoding Type:  One-Hot
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 35    ;
+; Total registers                              ; 36    ;
 ; Number of registers using Synchronous Clear  ; 0     ;
-; Number of registers using Synchronous Load   ; 5     ;
+; Number of registers using Synchronous Load   ; 6     ;
 ; Number of registers using Asynchronous Clear ; 2     ;
 ; Number of registers using Asynchronous Load  ; 0     ;
-; Number of registers using Clock Enable       ; 16    ;
+; Number of registers using Clock Enable       ; 17    ;
 ; Number of registers using Preset             ; 0     ;
 +----------------------------------------------+-------+
 
@@ -252,12 +253,22 @@ Encoding Type:  One-Hot
 Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
 
 
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "LCD_Transmitter:LCD"                                                                                                                          ;
++--------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------+
+; Port   ; Type  ; Severity ; Details                                                                                                                                      ;
++--------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------+
+; addr_i ; Input ; Info     ; Stuck at VCC                                                                                                                                 ;
+; selpwm ; Input ; Warning  ; Declared by entity but not connected by instance. If a default value exists, it will be used.  Otherwise, the port will be connected to GND. ;
++--------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------+
+
+
 +-------------------------------+
 ; Elapsed Time Per Partition    ;
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:00     ;
+; Top            ; 00:00:02     ;
 +----------------+--------------+
 
 
@@ -267,7 +278,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
-    Info: Processing started: Tue Feb 08 16:16:40 2022
+    Info: Processing started: Fri Feb 11 13:56:06 2022
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off LCD -c DE2115
 Info (20030): Parallel compilation is enabled and will use 8 of the 8 processors detected
 Info (12021): Found 2 design units, including 1 entities, in source file lcd_transmitter.vhd
@@ -291,6 +302,71 @@ Warning (10540): VHDL Signal Declaration warning at DE2115.vhd(75): used explici
 Warning (10540): VHDL Signal Declaration warning at DE2115.vhd(76): used explicit default value for signal "LCD_BLON" because signal was never assigned a value
 Warning (10540): VHDL Signal Declaration warning at DE2115.vhd(77): used explicit default value for signal "LCD_RW" because signal was never assigned a value
 Info (12128): Elaborating entity "LCD_Transmitter" for hierarchy "LCD_Transmitter:LCD"
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(151): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(151): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(152): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(152): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(153): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(153): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(154): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(154): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(155): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(155): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(156): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(156): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(157): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(157): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(158): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(158): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(159): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(159): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(160): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(160): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(161): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(161): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(162): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(162): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(163): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(163): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(164): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(164): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(165): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(165): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(166): signal "first_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(166): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(168): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(168): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(169): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(169): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(170): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(170): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(171): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(171): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(172): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(172): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(173): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(173): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(174): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(174): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(175): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(175): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(176): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(176): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(177): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(177): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(178): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(178): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(179): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(179): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(180): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(180): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(181): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(181): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(182): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(182): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(183): signal "second_line" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (10492): VHDL Process Statement warning at LCD_Transmitter.vhd(183): signal "selectMode" is read inside the Process Statement but isn't in the Process Statement's sensitivity list
+Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
 Warning (13034): The following nodes have both tri-state and non-tri-state drivers
     Warning (13035): Inserted always-enabled tri-state buffer between "LCD_DATA[0]" and its non-tri-state driver.
     Warning (13035): Inserted always-enabled tri-state buffer between "LCD_DATA[1]" and its non-tri-state driver.
@@ -436,37 +512,19 @@ Warning (13024): Output pins are stuck at VCC or GND
 Info (286030): Timing-Driven Synthesis is running
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
-Warning (21074): Design contains 21 input pin(s) that do not drive logic
+Warning (21074): Design contains 3 input pin(s) that do not drive logic
     Warning (15610): No output dependent on input pin "KEY[1]"
     Warning (15610): No output dependent on input pin "KEY[2]"
     Warning (15610): No output dependent on input pin "KEY[3]"
-    Warning (15610): No output dependent on input pin "SW[0]"
-    Warning (15610): No output dependent on input pin "SW[1]"
-    Warning (15610): No output dependent on input pin "SW[2]"
-    Warning (15610): No output dependent on input pin "SW[3]"
-    Warning (15610): No output dependent on input pin "SW[4]"
-    Warning (15610): No output dependent on input pin "SW[5]"
-    Warning (15610): No output dependent on input pin "SW[6]"
-    Warning (15610): No output dependent on input pin "SW[7]"
-    Warning (15610): No output dependent on input pin "SW[8]"
-    Warning (15610): No output dependent on input pin "SW[9]"
-    Warning (15610): No output dependent on input pin "SW[10]"
-    Warning (15610): No output dependent on input pin "SW[11]"
-    Warning (15610): No output dependent on input pin "SW[12]"
-    Warning (15610): No output dependent on input pin "SW[13]"
-    Warning (15610): No output dependent on input pin "SW[14]"
-    Warning (15610): No output dependent on input pin "SW[15]"
-    Warning (15610): No output dependent on input pin "SW[16]"
-    Warning (15610): No output dependent on input pin "SW[17]"
-Info (21057): Implemented 221 device resources after synthesis - the final resource count might be different
+Info (21057): Implemented 339 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 23 input pins
     Info (21059): Implemented 88 output pins
     Info (21060): Implemented 44 bidirectional pins
-    Info (21061): Implemented 66 logic cells
-Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 177 warnings
-    Info: Peak virtual memory: 4659 megabytes
-    Info: Processing ended: Tue Feb 08 16:16:47 2022
-    Info: Elapsed time: 00:00:07
-    Info: Total CPU time (on all processors): 00:00:02
+    Info (21061): Implemented 184 logic cells
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 224 warnings
+    Info: Peak virtual memory: 4676 megabytes
+    Info: Processing ended: Fri Feb 11 13:56:18 2022
+    Info: Elapsed time: 00:00:12
+    Info: Total CPU time (on all processors): 00:00:05
 
 
