@@ -157,9 +157,9 @@ LCD: LCD_Transmitter
 		port map (
 			reset_n    => KEY(0), 
 			clk	     => CLOCK_50,
-			data_i     => x"ABCD",
+			data_i     => SW(15 downto 0),
 			addr_i     => x"FF",
-			selectMode => "00", 	
+			selectMode => SW(17 downto 16), 	
 			data_o	  => LCD_DATA,
 			RS         => LCD_RS,
 			EN         => LCD_EN
