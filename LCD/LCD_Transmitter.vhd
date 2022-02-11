@@ -99,9 +99,9 @@ LCD_data(7  downto  0) <= x"3" & data_i(3 downto 0) when data_i(3 downto 0) < x"
                                               x"46" when data_i(3 downto 0) = x"F" else  
                                               (others => '0');
 
-LCD_PWM_Freq <= x"20203630" when selPWM = "00" else
-                x"20313230" when selPWM = "01" else
-                x"31303030" when selPWM = "10" else
+LCD_PWM_Freq <= x"20203630" when selPWM = "00" else -- --60
+                x"20313230" when selPWM = "01" else -- -120
+                x"31303030" when selPWM = "10" else -- 1000
                 (others => '0');
 
 -- First Line  --
