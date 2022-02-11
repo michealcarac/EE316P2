@@ -108,7 +108,6 @@ signal count_enable     : std_logic;
 signal mux_sel : std_logic_vector(1 downto 0);
     
 begin
-
     ROM_1port_0 : SinglePortROM
     port map(
         address => ROM_addr(7 downto 0),
@@ -139,41 +138,36 @@ begin
 
     inst_lcd : lcd
     port map(
-        clk     => clk_i,
+        clk     => count_increment_1hz,
         resetn  => reset_n,
         data_i  => SRAM_tx,
         addr_i  => SRAM_addr,
         selectMode => selectMode,
-        selectPWM => selectPWM,
-        EN => count_enable
+        selectPWM => selectPWM
     );
 
     inst_pwm : pwm
     port map(
         clk => clk_i,
-	    SRAM_in => ,
-	    frequency => ,
-	    reset => ,
-	    address_out => ,
-	    output => 
+	    SRAM_in => SRAM_tx,
+	    frequency => selectPWM,
+	    reset => reset_n,
+	    address_out => SRAM_addr
     );
 
     inst_i2c : i2c
     port map(
         clk => clk_i,
-        reset_n  => ,
-        data_i => ,
-        data_o => ,
-        SDA => ,
-        SCL => 
+        reset_n  => reset_n,
+        data_i => SRAM_tx
     );
-          
-	SRAM_addr(19 downto 0) 	<= "000000000000" & count_increment_60ns when fstate = init else	 
-										"000000000000" & count_increment_1hz when fstate = OP_enabled else
-										"000000000000" & data_reg(23 downto 16) when fstate = PR_data else
+    
+	SRAM_addr(19 downto 0) 	<= "000000000000" & count_increment_60ns when fstate = INIT else	 
+										"000000000000" & count_increment_1hz when fstate = TEST else
+										"000000000000" & data_reg(23 downto 16) when selectMode = "11" else --selectMode "11" covers 60hz, 120hz and 1000hz
 										(others => '0');
-	SRAM_tx(15 downto 0) <= ROM_output when fstate = init else
-									    data_reg(15 downto 0)  when fstate = PR_data else
+	SRAM_tx(15 downto 0) <= ROM_output when fstate = INIT else
+									    data_reg(15 downto 0)  when fstate =  else
 									    (others => '0');
 	ROM_addr <= count_increment_60ns;
 											
@@ -199,7 +193,7 @@ begin
                         ROM_done     <= '1';
                         count_reset  <= '1';
                         count_enable <= '0';
-                        fstate <= ;
+                        fstate <= TEST;
                     end if;
                 elsif ROM_done = '1' then
 					count_reset  <= '0';
@@ -217,8 +211,20 @@ begin
                 selectMode <= "01"; -- Test Mode
                 count_enable <= '1';
                 
+                if clk_en_1hz ='1' then
+                    data_reg(23 downto 0) <= count_increment_1hz;
+                    data_reg(15 downto 0) <= SRAM_rx;           -- Sends data to LCD and i2c
+                    SRAM_RW <= '1';                             -- Sets read for SRAM
+                    fstate <= TEST;
+                end if;
+
                 if KEY1 then
                     fstate <= PAUSE;
+                else if KEY0 then
+                    selectMode <= "00";
+                    if count_increment_60ns = "99999999" AND KEY0 then --if button is pressed for x time then initializes
+                        fstate <= INIT;
+                    end if;
                 else if KEY2 then
                     fstate <= HX60;
                 end if;
@@ -226,16 +232,16 @@ begin
                 if clk_en_1hz = '1' then
 					data_reg(23 downto 16) <= count_increment_1hz;--Send Address to 7 seg
 					data_reg(15 downto 0) <= SRAM_rx;             --Send data to SRAM
-                    SRAM_RW <= '1'; --To read
+                    SRAM_RW <= '1';                               --To read
                     fstate <= TEST;
                 elsif kp_valid = '1' and kp_en = '1' then
-                    if kp_value = KEY0 then --if L
+                    if kp_value = "" then --if L
                         count_direction_1hz <= NOT count_direction_1hz;
                         fstate <= OP_enabled;
-                    elsif kp_value = KEY1 then  --if H
+                    elsif kp_value = "" then  --if H
                         count_enable <= '0';
 						fstate <= OP_disabled; --Disable the counter
-                    elsif kp_value = KEY2 then  --if Shift
+                    elsif kp_value = "" then  --if Shift
 						data_reg(23 downto 0) <= (others => '0');
 						count_reset  <= '1';
 						count_enable <= '0';
@@ -254,7 +260,7 @@ begin
                 selectMode <= "10"; -- Pause Mode
                 count_enable <= '0'; --Disable Counter
 				count_reset  <= '0'; --Dont reset
-                
+
                 if KEY1 then
                     fstate <= TEST;
                 end if;
@@ -262,7 +268,6 @@ begin
                 when HZ60 =>
                 selectMode <= "11";
                 selectPWM <= "00";
-                
 
                 if KEY3 then
                     fstate <= HZ120;
@@ -319,6 +324,8 @@ begin
                 when HZ1000 => 
                 selectMode <= "11";
                 selectPWM <= "10";    
+
+                
 
                 if KEY3 then
                     fstate <= HZ60;
