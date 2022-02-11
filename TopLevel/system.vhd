@@ -15,15 +15,20 @@ entity system is
         clk_en_60ns     : in std_logic; --60ns for sending rom into SRAM
         clk_en_1hz      : in std_logic; --1hz for grabbing sram data to send to 7 seg
         kp_en           : in std_logic; --200ms en from keypad to validate presses 
-        
+
         selectMode      : out std_logic_vector(1 downto 0);
+        selectPWM       : out std_logic_vector(1 downto 0);
         -- Out Ports
         SRAM_tx         : out std_logic_vector(DataSize-1 downto 0);
         SRAM_RW         : out std_logic;
         SRAM_en         : out std_logic;
         SRAM_addr       : out std_logic_vector(AddrSize-1 downto 0) := (others => '0');
-        data_o          : out std_logic_vector(23 downto 0) -- Will go to 7 segs
+        data_o          : out std_logic_vector(23 downto 0); -- Will go to 7 segs
         
+        KEY0            : in std_logic;
+        KEY1            : in std_logic;
+        KEY2            : in std_logic;
+        KEY3            : in std_logic
     );
 end system;
 
@@ -67,6 +72,17 @@ port(
 	reset : in std_logic;	
 	address_out : out std_logic_vector(7 downto 0);
 	output : out std_logic
+);
+end component;
+
+component i2c is
+port(
+    clk         : in  std_logic; --Clock In
+    reset_n     : in  std_logic; --Asynchronous Reset Active Low  
+    data_i      : in  std_logic_vector(15 downto 0);  --To be transmitted off master
+    data_o      : out std_logic_vector(7 downto 0); --Read over I2C
+    SDA         : inout std_logic;   --Data/Address Line
+    SCL         : inout std_logic    --Clock Line
 );
 end component;
 
@@ -121,20 +137,35 @@ begin
         q		=> count_increment_1hz			    
     );
 
-    lcd_port : lcd
+    inst_lcd : lcd
     port map(
-        clk => count,
-        resetn =>reset_n,
-        data_i => SRAM_tx,
-        addr_i => SRAM_addr,
+        clk     => clk_i,
+        resetn  => reset_n,
+        data_i  => SRAM_tx,
+        addr_i  => SRAM_addr,
         selectMode => selectMode,
-        
+        selectPWM => selectPWM,
         EN => count_enable
     );
 
-    pwm_port : pwm
+    inst_pwm : pwm
     port map(
+        clk => clk_i,
+	    SRAM_in => ,
+	    frequency => ,
+	    reset => ,
+	    address_out => ,
+	    output => 
+    );
 
+    inst_i2c : i2c
+    port map(
+        clk => clk_i,
+        reset_n  => ,
+        data_i => ,
+        data_o => ,
+        SDA => ,
+        SCL => 
     );
           
 	SRAM_addr(19 downto 0) 	<= "000000000000" & count_increment_60ns when fstate = init else	 
@@ -164,18 +195,17 @@ begin
 -----------------------------------------------------------------
                 when INIT =>
                 if clk_en_60ns = '1' AND ROM_done = '0' then -- This will run EVERY 60ns
-                    fstate <= init;
                     if count_increment_60ns = x"FF" then
                         ROM_done     <= '1';
                         count_reset  <= '1';
                         count_enable <= '0';
-                        fstate <= init;
+                        fstate <= ;
                     end if;
                 elsif ROM_done = '1' then
 					count_reset  <= '0';
 					count_enable <= '1';
 				    SRAM_RW <= '1'; -- to read
-                    fstate <= OP_enabled;
+                    fstate <= INIT;
                 else
 					SRAM_RW <= '0';
 					count_reset <= '0';
@@ -184,10 +214,19 @@ begin
                 end if;
 -----------------------------------------------------------------                       
                 when TEST =>
-                selectMode = "01";
+                selectMode <= "01"; -- Test Mode
+                count_enable <= '1';
+                
+                if KEY1 then
+                    fstate <= PAUSE;
+                else if KEY2 then
+                    fstate <= HX60;
+                end if;
+
                 if clk_en_1hz = '1' then
 					data_reg(23 downto 16) <= count_increment_1hz;--Send Address to 7 seg
-					data_reg(15 downto 0) <= SRAM_rx;                        SRAM_RW <= '1'; --To read
+					data_reg(15 downto 0) <= SRAM_rx;             --Send data to SRAM
+                    SRAM_RW <= '1'; --To read
                     fstate <= TEST;
                 elsif kp_valid = '1' and kp_en = '1' then
                     if kp_value = KEY0 then --if L
@@ -212,29 +251,38 @@ begin
                 end if;
 -----------------------------------------------------------------
                 when PAUSE =>
-                selectMode = "10";
-                if kp_valid = '1' and kp_en = '1' AND kp_value = "10010" then --If H
-                    count_enable <= '1'; --Enable Counter
-					count_reset  <= '0'; --Dont reset
-					fstate <= OP_enabled;  --Enable the Counter
-                else
-                    fstate <= OP_disabled;
+                selectMode <= "10"; -- Pause Mode
+                count_enable <= '0'; --Disable Counter
+				count_reset  <= '0'; --Dont reset
+                
+                if KEY1 then
+                    fstate <= TEST;
                 end if;
 -----------------------------------------------------------------                        
                 when HZ60 =>
-                selectMode = "11";
-                selectPWM = "00";
+                selectMode <= "11";
+                selectPWM <= "00";
+                
+
+                if KEY3 then
+                    fstate <= HZ120;
+                elsif KEY2 then
+                    fstate <= TEST;
+                end if; 
+
                 if kp_valid = '1' and kp_en = '1' then --If keypress is valid (0-F), then put it in data registers
                     if kp_value = "10010" then --if H
                         count_reset  <= '1'; --Reset Counter when programming
 						count_enable <= '0'; --Disable counter
 						fstate <= PR_data;
                     elsif kp_value = "10001" then --if Shift
-						count_reset  <= '0';								count_enable <= '1';
+						count_reset  <= '0';								
+                        count_enable <= '1';
                         fstate <= OP_enabled;
                     else
-                        data_reg(23 downto 16) <= data_reg(19 downto 16) & kp_value(3 downto 0);                            fstate <= PR_addr; 
-                        end if; 
+                        data_reg(23 downto 16) <= data_reg(19 downto 16) & kp_value(3 downto 0);                            
+                        fstate <= PR_addr; 
+                    end if; 
                 else
 					count_reset  <= '1'; --Reset counter when programming
 					count_enable <= '0';  --Disable Counter
@@ -242,34 +290,45 @@ begin
                 end if;
 -----------------------------------------------------------------                            
                 when HZ120 =>
-                selectMode = "11";
-                selectPWM = "10";
-                    count_reset  <= '1'; --Reset Counter when programming
-                    count_enable <= '0'; --Disable counter
-                    if kp_valid = '1' and kp_en = '1' then
-                        if kp_value = "10010" then --If H
-                            fstate <= PR_addr;
-                        elsif kp_value = "10011" then --if L, Load data into SRAM
-                            SRAM_RW <= '0'; --Write
-									  --SRAM_tx(15 downto 0)   <= data_reg(15 downto 0);
-                            fstate <= PR_data;
-                        else
+                selectMode <= "11";
+                selectPWM <= "01";
+                
+                if KEY3 then
+                    fstate <= HZ1000;
+                elsif KEY2 then
+                    fstate <= TEST;
+                end if;
+                
+                count_reset  <= '1'; --Reset Counter when programming
+                count_enable <= '0'; --Disable counter
+                if kp_valid = '1' and kp_en = '1' then
+                    if kp_value = "10010" then --If H
+                        fstate <= PR_addr;
+                    elsif kp_value = "10011" then --if L, Load data into SRAM
+                        SRAM_RW <= '0'; --Write
+						--SRAM_tx(15 downto 0)   <= data_reg(15 downto 0);
+                        fstate <= PR_data;
+                    else
                         data_reg(15 downto 0) <= data_reg(11 downto 8) & data_reg(7 downto 4) & data_reg(3 downto 0) & kp_value(3 downto 0);
                         fstate <= PR_data;
-                        end if;                     
-                    else 
-                        fstate <= PR_data;
-                    end if;
+                    end if;                     
+                else 
+                    fstate <= PR_data;
+                end if;
 -----------------------------------------------------------------                    
                 when HZ1000 => 
-                    
-                    
+                selectMode <= "11";
+                selectPWM <= "10";    
 
-                when others =>
-                    fstate <= init;
-                end case;
-            end if;
-        end process;
+                if KEY3 then
+                    fstate <= HZ60;
+                elsif KEY2 then
+                    fstate <= TEST;
+                end if;
+
+            end case;
+        end if;
+    end process;
 
     data_o <= data_reg;
     SRAM_en <= clk_en_60ns;
