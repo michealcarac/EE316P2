@@ -13,10 +13,10 @@ entity I2C_User is
         clk         : in  std_logic; --Clock In
         reset_n     : in  std_logic; --Asynchronous Reset Active Low  
         data_i      : in  std_logic_vector(15 downto 0);  --To be transmitted off master
-		  data_o      : out std_logic_vector(7 downto 0); --Read over I2C
+		data_o      : out std_logic_vector(7 downto 0); --Read over I2C
         SDA         : inout std_logic;   --Data/Address Line
         SCL         : inout std_logic    --Clock Line
-        -- If en is high at the conclsion of transaction, then a new address read/write command and data is latched
+        -- If en is high at the conclusion of transaction, then a new address read/write command and data is latched
         );
 end i2c_user;
 
