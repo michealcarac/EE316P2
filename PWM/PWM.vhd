@@ -24,7 +24,7 @@ architecture arch of PWM is
 
 	begin
 	
-	process(clk)
+	process(clk, frequency, reset)
 	begin
 		
 		if frequency = "00" then
@@ -46,7 +46,9 @@ architecture arch of PWM is
 			else
 					output <= '0';
 			end if;
-		elsif reset = '1' then
+		end if;
+		
+		if reset = '1' then
 			count32 <= to_unsigned(0, 32);
 			count8 <= to_unsigned(0, 8);
 			address_out <= X"00";
