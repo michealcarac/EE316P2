@@ -139,7 +139,10 @@ component LCD_Transmitter is
 	PORT(
 		clk       : IN     STD_LOGIC;                     --system clock
 		reset_n   : IN     STD_LOGIC;
-		oData     : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0);  -- 8 bits, MSB is RS
+		data_i    : IN     STD_LOGIC_VECTOR(15 DOWNTO 0);  -- 16 bits
+		addr_i    : IN     STD_LOGIC_VECTOR(7 DOWNTO 0);
+		selectMode: IN     STD_LOGIC_VECTOR(1 DOWNTO 0);  -- 00 = Initialization, 01 = TestMode, 10 = PauseMode, 11 = PWMMode
+		data_o    : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0);  -- 8 bits, MSB is RS
 		RS        : OUT    STD_LOGIC;
 		EN        : OUT    STD_LOGIC
 		);  
@@ -152,11 +155,14 @@ BEGIN
 
 LCD: LCD_Transmitter
 		port map (
-			reset_n => KEY(0), 
-			clk	    => CLOCK_50, 	
-			oData	=> LCD_DATA,
-			RS      => LCD_RS,
-			EN      => LCD_EN
+			reset_n    => KEY(0), 
+			clk	     => CLOCK_50,
+			data_i     => x"ABCD",
+			addr_i     => x"FF",
+			selectMode => "00", 	
+			data_o	  => LCD_DATA,
+			RS         => LCD_RS,
+			EN         => LCD_EN
 		);
 
 END structural;
