@@ -1,0 +1,41 @@
+
+State Machine - |DE2115|top_level:Inst_top_level|fstate
+Name fstate.HZ1000 fstate.HZ120 fstate.HZ60 fstate.PAUSE fstate.TEST fstate.INIT 
+fstate.INIT 0 0 0 0 0 0 
+fstate.TEST 0 0 0 0 1 1 
+fstate.PAUSE 0 0 0 1 0 1 
+fstate.HZ60 0 0 1 0 0 1 
+fstate.HZ120 0 1 0 0 0 1 
+fstate.HZ1000 1 0 0 0 0 1 
+
+State Machine - |DE2115|top_level:Inst_top_level|SRAM_Controller:SRAM|fstate
+Name fstate.read2 fstate.read1 fstate.write2 fstate.write1 fstate.ready 
+fstate.ready 0 0 0 0 0 
+fstate.write1 0 0 0 1 1 
+fstate.write2 0 0 1 0 1 
+fstate.read1 0 1 0 0 1 
+fstate.read2 1 0 0 0 1 
+
+State Machine - |DE2115|top_level:Inst_top_level|I2C_User:i2c_entity|state
+Name state.busy_state state.write_data state.start 
+state.start 0 0 0 
+state.write_data 0 1 1 
+state.busy_state 1 0 1 
+
+State Machine - |DE2115|top_level:Inst_top_level|I2C_User:i2c_entity|i2c_master:I2C_Transmit_Read|state
+Name state.stop state.mstr_ack state.slv_ack2 state.rd state.wr state.slv_ack1 state.command state.start state.ready 
+state.ready 0 0 0 0 0 0 0 0 0 
+state.start 0 0 0 0 0 0 0 1 1 
+state.command 0 0 0 0 0 0 1 0 1 
+state.slv_ack1 0 0 0 0 0 1 0 0 1 
+state.wr 0 0 0 0 1 0 0 0 1 
+state.rd 0 0 0 1 0 0 0 0 1 
+state.slv_ack2 0 0 1 0 0 0 0 0 1 
+state.mstr_ack 0 1 0 0 0 0 0 0 1 
+state.stop 1 0 0 0 0 0 0 0 1 
+
+State Machine - |DE2115|top_level:Inst_top_level|LCD_Transmitter:lcd_entity|state
+Name state.repeat state.enable state.start 
+state.start 0 0 0 
+state.enable 0 1 1 
+state.repeat 1 0 1 

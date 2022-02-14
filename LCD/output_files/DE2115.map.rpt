@@ -1,5 +1,5 @@
 Analysis & Synthesis report for DE2115
-Fri Feb 11 13:56:18 2022
+Mon Feb 14 12:02:23 2022
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
 
 
@@ -44,7 +44,7 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                          ;
 +------------------------------------+--------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Fri Feb 11 13:56:18 2022            ;
+; Analysis & Synthesis Status        ; Successful - Mon Feb 14 12:02:23 2022            ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Full Version ;
 ; Revision Name                      ; DE2115                                           ;
 ; Top-level Entity Name              ; DE2115                                           ;
@@ -278,7 +278,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
-    Info: Processing started: Fri Feb 11 13:56:06 2022
+    Info: Processing started: Mon Feb 14 12:02:09 2022
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off LCD -c DE2115
 Info (20030): Parallel compilation is enabled and will use 8 of the 8 processors detected
 Info (12021): Found 2 design units, including 1 entities, in source file lcd_transmitter.vhd
@@ -523,8 +523,8 @@ Info (21057): Implemented 339 device resources after synthesis - the final resou
     Info (21061): Implemented 184 logic cells
 Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 224 warnings
     Info: Peak virtual memory: 4676 megabytes
-    Info: Processing ended: Fri Feb 11 13:56:18 2022
-    Info: Elapsed time: 00:00:12
-    Info: Total CPU time (on all processors): 00:00:05
+    Info: Processing ended: Mon Feb 14 12:02:23 2022
+    Info: Elapsed time: 00:00:14
+    Info: Total CPU time (on all processors): 00:00:06
 
 

@@ -1,5 +1,5 @@
 TimeQuest Timing Analyzer report for DE2115
-Fri Feb 11 13:57:26 2022
+Mon Feb 14 12:03:36 2022
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
 
 
@@ -3335,7 +3335,7 @@ No dedicated SERDES Receiver circuitry present in device or used in design
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit TimeQuest Timing Analyzer
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Full Version
-    Info: Processing started: Fri Feb 11 13:57:13 2022
+    Info: Processing started: Mon Feb 14 12:03:23 2022
 Info: Command: quartus_sta LCD -c DE2115
 Info: qsta_default_script.tcl version: #1
 Info (20030): Parallel compilation is enabled and will use 8 of the 8 processors detected
@@ -3417,8 +3417,8 @@ Info (332146): Worst-case minimum pulse width slack is -3.000
 Info (332102): Design is not fully constrained for setup requirements
 Info (332102): Design is not fully constrained for hold requirements
 Info: Quartus II 64-Bit TimeQuest Timing Analyzer was successful. 0 errors, 4 warnings
-    Info: Peak virtual memory: 4709 megabytes
-    Info: Processing ended: Fri Feb 11 13:57:26 2022
+    Info: Peak virtual memory: 4711 megabytes
+    Info: Processing ended: Mon Feb 14 12:03:36 2022
     Info: Elapsed time: 00:00:13
     Info: Total CPU time (on all processors): 00:00:06
 

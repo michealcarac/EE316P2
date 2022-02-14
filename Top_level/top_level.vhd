@@ -7,7 +7,7 @@ entity top_level is
         -- In Ports
         reset_n         : in    std_logic;
         clk_i           : in    std_logic;
-        op_modes        : in    std_logic_vector(3 downto 0); -- 0001=> Init, 0010 => test/pause, 0100 => test/pwm, 1000 => frequency change
+        op_modes        : in    std_logic_vector(2 downto 0); -- 000, 001 = key1, 010 = key2, 100 = key3
         
         sram_io         : inout std_logic_vector(15 downto 0);
         sram_addr       : out   std_logic_vector(19 downto 0);
@@ -24,7 +24,7 @@ entity top_level is
         lcd_RS          : out   std_logic;
 
         i2c_SDA         : inout   std_logic;
-        i2c_SCL         : inout   std_logic;
+        i2c_SCL         : inout   std_logic
 
     );
 end top_level;
@@ -96,6 +96,7 @@ port(
     reset_n     : in    std_logic;
     data_i      : in    std_logic_vector(15 downto 0);  -- 16 bits
     addr_i      : in    std_logic_vector(7  downto 0);
+	selectPWM   : in    std_logic_vector(1  downto 0);
     selectMode  : in    std_logic_vector(1  downto 0);  --00 = Initialization, 01 = TestMode, 10 = PauseMode, 11 = PWMMode
     data_o      : out   std_logic_vector(7  downto 0);  -- 8 bits, MSB is RS
     RS          : out   std_logic;
@@ -116,11 +117,11 @@ port(
 end component;
 
 component edge_detector is
-generic(edge: std_logic := '0') -- 0 = falling, 1 = rising
+generic(edge: std_logic := '0'); -- 0 = falling, 1 = rising
 PORT (
     clk_i  : in  std_logic;
     data_i : in  std_logic;
-    data_o : out std_logic;
+    data_o : out std_logic
     );	
 END component;
 
@@ -158,6 +159,8 @@ signal SRAM_data_i   : std_logic_vector(15 downto 0); -- 16 bits, Into Controlle
 signal SRAM_data_o   : std_logic_vector(15 downto 0); -- 16 bits, From Controller
 signal SRAM_addr_i   : std_logic_vector(19  downto 0); -- 20 bits, Into controller
 signal SRAM_addr_o   : std_logic_vector(19  downto 0); -- 20 bits, From controller, into other blocks
+signal SRAM_RW       : std_logic;
+signal SRAM_busy_flag: std_logic;
 -- Reset
 signal sys_reset_n   : std_logic;
 signal power_reset_n : std_logic;
@@ -165,11 +168,11 @@ signal power_reset_n : std_logic;
 signal ROM_output    : std_logic_vector(15 downto 0) := (others => '0');
 signal ROM_done      : std_logic;
 -- LCD/PWM --
-signal selectMode    : std_logic_vector(1 downto 0);
-signal selectPWM     : std_logic_vector(1 downto 0);
+signal selectMode    : std_logic_vector(1 downto 0):=  "00";
+signal selectPWM     : std_logic_vector(1 downto 0) := "00";
 signal pwm_addr_o    : std_logic_vector(7 downto 0);
 -- Operations --
-signal KEY0          : std_logic; 
+
 signal KEY1          : std_logic;
 signal KEY2          : std_logic;
 signal KEY3          : std_logic; 
@@ -178,35 +181,27 @@ signal KEY3          : std_logic;
 begin
 
     rising_edge0 : edge_detector
-    generic map(edge <= '1'); -- Rising
+    generic map(edge => '1') -- Rising
     PORT map(
         clk_i  => clk_i,
         data_i => op_modes(0),
-        data_o => KEY0
+        data_o => KEY1
 	);	
     rising_edge1 : edge_detector
-    generic map(edge <= '1'); -- Rising
+    generic map(edge => '1') -- Rising
     PORT map(
         clk_i  => clk_i,
         data_i => op_modes(1),
-        data_o => KEY1
+        data_o => KEY2
 	);
     rising_edge2 : edge_detector
-    generic map(edge <= '1'); -- Rising
+    generic map(edge => '1') -- Rising
     PORT map(
         clk_i  => clk_i,
         data_i => op_modes(2),
-        data_o => KEY2
-	);
-    rising_edge3 : edge_detector
-    generic map(edge <= '1'); -- Rising
-    PORT map(
-        clk_i  => clk_i,
-        data_i => op_modes(3),
         data_o => KEY3
 	);
     
-
     power_on_reset : reset_delay
     port map(
         iclk   => clk_i,
@@ -217,18 +212,18 @@ begin
 
     en_1hz : clk_enabler
     GENERIC MAP (
-		CONSTANT cnt_max : integer := 49999999);      --  1.0 Hz 
+		cnt_max => 49999999)      --  1.0 Hz 
     port map(
         clock    => clk_i,
-        clock_en => clk_en_1hz
+        clk_en => clk_en_1hz
     );
 
     en_60ns : clk_enabler
     GENERIC MAP (
-		CONSTANT cnt_max : integer := 3);      --  60 ns
+		cnt_max => 3)      --  60 ns
     port map(
         clock    => clk_i,
-        clock_en => clk_en_60ns
+        clk_en => clk_en_60ns
     );
 
 
@@ -267,9 +262,9 @@ begin
         reset_n    => sys_reset_n,
         data_i     => SRAM_data_o,
         addr_i     => SRAM_addr_o(7 downto 0),
-        selectMode => selectMode,
         selectPWM  => selectPWM,
-        data_o     => lcd_o,
+		  selectMode => selectMode,
+        data_o     => lcd_data_o,
         RS         => lcd_RS,
         EN         => lcd_EN
     );
@@ -350,7 +345,7 @@ BEGIN
     elsif rising_edge(clk_i) then
         case fstate is
             when INIT => --This needs to be worked on for proper key0 held for initialization: Probably only have the writing to ROM on reset, key0 different state. 
-                
+                fstate <= INIT;
                 if ROM_done = '0' then
                     SRAM_RW     <= '0'; -- to write
                     count_reset <= '0';
@@ -363,18 +358,12 @@ BEGIN
                         count_reset  <= '1';
                         count_enable <= '0';
                     end if;
-                elsif ROM_done = '1' AND KEY0 '1' then --Progress only when KEY0 is let go and ROM is done
-                    count_reset  <= '0';
-                    count_enable <= '1';
+                elsif ROM_done = '1'  then --Progress only when KEY0 is let go and ROM is done
+                    count_reset  <= '1';
+                    count_enable <= '0';
                     SRAM_RW      <= '1'; -- to read
                     selectMode   <= "01"; --Test Mode
                     fstate <= TEST;
-                elsif ROM_done = '1' then
-                    count_reset <= '1';
-                    count_enable<= '0';
-                    selectMode  <= "00";
-                    selectPWM   <= "00";
-                    fstate <= INIT;
                 end if;
 
             
@@ -407,30 +396,24 @@ BEGIN
             --         fstate <= INIT;
             --     end if;   
 
-            -- when TEST => 
+            when TEST => 
                 
-            --     selectMode <= "01";     --Test Mode
-            --     fstate <= TEST;
-            --     if    KEY0 = '1' => --Key0
-            --         selectMode <= "00";
-            --         fstate <= INIT;
-            --     elsif KEY1 = '1' => --Key1
-            --         count_enable <= '0';
-            --         selectMode <= "10"; --Pause mode
-            --         fstate <= PAUSE;
-            --     elsif KEY2 = '1' => --Key2
-            --         selectMode <= "11"; --PWM Mode
-            --         fstate <= HZ60;
-            --     end if;
+                selectMode <= "01";     --Test Mode
+                fstate <= TEST;
+                if KEY1 = '1' then --Key1
+                    count_enable <= '0';
+                    selectMode <= "10"; --Pause mode
+                    fstate <= PAUSE;
+                elsif KEY2 = '1' then--Key2
+                    selectMode <= "11"; --PWM Mode
+                    fstate <= HZ60;
+                end if;
             
             when PAUSE => 
                 
                 selectMode <= "10"; --Pause mode
                 fstate <= PAUSE;
-                if    KEY0 = '1' => --Key0
-                    selectMode <= "00"; --Init mode
-                    fstate <= INIT;
-                elsif KEY1 = '1' => --Key1
+                if KEY1 = '1' then--Key1
                     count_enable <= '1';
                     selectMode <= "01"; --Test Mode
                     fstate <= TEST;
@@ -440,13 +423,11 @@ BEGIN
             
                 selectPWM <= "00";
                 fstate <= HZ60;
-                if    KEY0 = '1' =>
-                    selectMode <= "00" --Init Mode
-                    fstate <= INIT;
-                elsif KEY2 = '1' => 
+                
+                if KEY2 = '1' then
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif KEY3 = '1' =>
+                elsif KEY3 = '1' then
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "01"; --120Hz
                     fstate     <= HZ120;
@@ -456,13 +437,11 @@ BEGIN
             
                 selectPWM <= "01";
                 fstate <= HZ120;
-                if    KEY0 = '1' =>
-                    selectMode <= "00" --Init Mode
-                    fstate <= INIT;
-                elsif KEY2 = '1' => 
+            
+                if KEY2 = '1' then
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif KEY3 = '1' =>
+                elsif KEY3 = '1' then
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "10"; -- 1000Hz
                     fstate     <= HZ1000;
@@ -472,13 +451,11 @@ BEGIN
             
                 selectPWM <= "10";
                 fstate <= HZ1000;
-                if    KEY0 = '1' =>
-                    selectMode <= "00" --Init Mode
-                    fstate     <= INIT;
-                elsif KEY2 = '1' => 
+                
+                if KEY2 = '1' then
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif KEY3 = '1' =>
+                elsif KEY3 = '1' then
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "00"; --60Hz
                     fstate     <= HZ60;
@@ -488,6 +465,8 @@ BEGIN
             -- do nothing
         end case; 
     end if;
+ end process;
+	 
                                 
 
 end Behavioral;
