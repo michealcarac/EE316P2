@@ -8,7 +8,7 @@ entity PWM is
 		clk : in std_logic;
 		SRAM_in : in std_logic_vector(15 downto 0);
 		frequency : in std_logic_vector(1 downto 0);
-		reset : in std_logic;
+		reset_n : in std_logic;
 		
 		address_out : out std_logic_vector(7 downto 0);
 		output : out std_logic
@@ -35,7 +35,7 @@ architecture arch of PWM is
 			M <= to_unsigned(85900, 32);
 		end if;
 
-		if rising_edge(clk) and reset = '0' then
+		if rising_edge(clk) and reset = '1' then
 			count32 <= count32 + M;	
 			address_out <= std_logic_vector(count32(31 downto 24));
 			num <= unsigned(SRAM_in(15 downto 8));
@@ -48,7 +48,7 @@ architecture arch of PWM is
 			end if;
 		end if;
 		
-		if reset = '1' then
+		if reset = '0' then
 			count32 <= to_unsigned(0, 32);
 			count8 <= to_unsigned(0, 8);
 			address_out <= X"00";
