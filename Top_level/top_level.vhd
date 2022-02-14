@@ -7,7 +7,7 @@ entity top_level is
         -- In Ports
         reset_n         : in    std_logic;
         clk_i           : in    std_logic;
-        op_modes        : in    std_logic_vector(2 downto 0); -- 001 => test/pause, 010 => test/pwm, 100 => frequency change
+        op_modes        : in    std_logic_vector(3 downto 0); -- 0001=> Init, 0010 => test/pause, 0100 => test/pwm, 1000 => frequency change
         
         sram_io         : inout std_logic_vector(15 downto 0);
         sram_addr       : out   std_logic_vector(19 downto 0);
@@ -104,6 +104,7 @@ port(
 end component;
 
 component pwm is
+generic(N : integer := 32);
 port(
     clk           : in  std_logic;
 	SRAM_in       : in  std_logic_vector(15 downto 0);
@@ -113,6 +114,15 @@ port(
 	output        : out std_logic
     );
 end component;
+
+component edge_detector is
+generic(edge: std_logic := '0') -- 0 = falling, 1 = rising
+PORT (
+    clk_i  : in  std_logic;
+    data_i : in  std_logic;
+    data_o : out std_logic;
+    );	
+END component;
 
 component i2c_user is
 GENERIC(
@@ -158,9 +168,44 @@ signal ROM_done      : std_logic;
 signal selectMode    : std_logic_vector(1 downto 0);
 signal selectPWM     : std_logic_vector(1 downto 0);
 signal pwm_addr_o    : std_logic_vector(7 downto 0);
+-- Operations --
+signal KEY0          : std_logic; 
+signal KEY1          : std_logic;
+signal KEY2          : std_logic;
+signal KEY3          : std_logic; 
 
 
 begin
+
+    rising_edge0 : edge_detector
+    generic map(edge <= '1'); -- Rising
+    PORT map(
+        clk_i  => clk_i,
+        data_i => op_modes(0),
+        data_o => KEY0
+	);	
+    rising_edge1 : edge_detector
+    generic map(edge <= '1'); -- Rising
+    PORT map(
+        clk_i  => clk_i,
+        data_i => op_modes(1),
+        data_o => KEY1
+	);
+    rising_edge2 : edge_detector
+    generic map(edge <= '1'); -- Rising
+    PORT map(
+        clk_i  => clk_i,
+        data_i => op_modes(2),
+        data_o => KEY2
+	);
+    rising_edge3 : edge_detector
+    generic map(edge <= '1'); -- Rising
+    PORT map(
+        clk_i  => clk_i,
+        data_i => op_modes(3),
+        data_o => KEY3
+	);
+    
 
     power_on_reset : reset_delay
     port map(
@@ -305,7 +350,8 @@ BEGIN
     elsif rising_edge(clk_i) then
         case fstate is
             when INIT => --This needs to be worked on for proper key0 held for initialization: Probably only have the writing to ROM on reset, key0 different state. 
-                if ROM_done = '0' AND op_modes = "0001" then -- If ROM is not done writing AND KEY0 is pressed and held 
+                
+                if ROM_done = '0' then
                     SRAM_RW     <= '0'; -- to write
                     count_reset <= '0';
                     count_enable<= '1';
@@ -316,47 +362,75 @@ BEGIN
                         ROM_done     <= '1';
                         count_reset  <= '1';
                         count_enable <= '0';
-                        fstate <= INIT;
                     end if;
-                elsif ROM_done = '1' then
+                elsif ROM_done = '1' AND KEY0 '1' then --Progress only when KEY0 is let go and ROM is done
                     count_reset  <= '0';
                     count_enable <= '1';
                     SRAM_RW      <= '1'; -- to read
                     selectMode   <= "01"; --Test Mode
                     fstate <= TEST;
-                else 
-                    SRAM_RW     <= '0'; -- to write
+                elsif ROM_done = '1' then
                     count_reset <= '1';
                     count_enable<= '0';
                     selectMode  <= "00";
                     selectPWM   <= "00";
-                    ROM_done    <= '0';
                     fstate <= INIT;
-                end if;   
-            when TEST => 
-                
-                selectMode <= "01";     --Test Mode
-                
-                if op_modes = "0001" => --Key0
-                    selectMode <= "00";
-                    fstate <= INIT;
-                elsif op_modes = "0010" => --Key1
-                    count_enable <= '0';
-                    selectMode <= "10"; --Pause mode
-                    fstate <= PAUSE;
-                elsif op_modes = "0100" => --Key2
-                    selectMode <= "11"; --PWM Mode
-                    fstate <= HZ60;
                 end if;
+
+            
+            --     if ROM_done = '0' AND KEY0 = '1' then -- If ROM is not done writing AND KEY0 is pressed and held 
+            --         SRAM_RW     <= '0'; -- to write
+            --         count_reset <= '0';
+            --         count_enable<= '1';
+            --         selectMode  <= "00";
+            --         selectPWM   <= "00";
+            --         fstate <= INIT;
+            --         if count_increment_60ns = x"FF" then
+            --             ROM_done     <= '1';
+            --             count_reset  <= '1';
+            --             count_enable <= '0';
+            --             fstate <= INIT;
+            --         end if;
+            --     elsif ROM_done = '1' then
+            --         count_reset  <= '0';
+            --         count_enable <= '1';
+            --         SRAM_RW      <= '1'; -- to read
+            --         selectMode   <= "01"; --Test Mode
+            --         fstate <= TEST;
+            --     else 
+            --         SRAM_RW     <= '0'; -- to write
+            --         count_reset <= '1';
+            --         count_enable<= '0';
+            --         selectMode  <= "00";
+            --         selectPWM   <= "00";
+            --         ROM_done    <= '0';
+            --         fstate <= INIT;
+            --     end if;   
+
+            -- when TEST => 
+                
+            --     selectMode <= "01";     --Test Mode
+            --     fstate <= TEST;
+            --     if    KEY0 = '1' => --Key0
+            --         selectMode <= "00";
+            --         fstate <= INIT;
+            --     elsif KEY1 = '1' => --Key1
+            --         count_enable <= '0';
+            --         selectMode <= "10"; --Pause mode
+            --         fstate <= PAUSE;
+            --     elsif KEY2 = '1' => --Key2
+            --         selectMode <= "11"; --PWM Mode
+            --         fstate <= HZ60;
+            --     end if;
             
             when PAUSE => 
                 
                 selectMode <= "10"; --Pause mode
-
-                if op_modes = "0001" => --Key0
+                fstate <= PAUSE;
+                if    KEY0 = '1' => --Key0
                     selectMode <= "00"; --Init mode
                     fstate <= INIT;
-                elsif op_modes = "0010" => --Key1
+                elsif KEY1 = '1' => --Key1
                     count_enable <= '1';
                     selectMode <= "01"; --Test Mode
                     fstate <= TEST;
@@ -364,15 +438,15 @@ BEGIN
                 
             when HZ60 =>
             
-                 selectPWM <= "00";
-            
-                if op_modes = "0001" =>
+                selectPWM <= "00";
+                fstate <= HZ60;
+                if    KEY0 = '1' =>
                     selectMode <= "00" --Init Mode
                     fstate <= INIT;
-                elsif op_modes = "0100" => 
+                elsif KEY2 = '1' => 
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif op_modes = "1000" =>
+                elsif KEY3 = '1' =>
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "01"; --120Hz
                     fstate     <= HZ120;
@@ -381,14 +455,14 @@ BEGIN
             when HZ120 =>
             
                 selectPWM <= "01";
-            
-                if op_modes = "0001" =>
+                fstate <= HZ120;
+                if    KEY0 = '1' =>
                     selectMode <= "00" --Init Mode
                     fstate <= INIT;
-                elsif op_modes = "0100" => 
+                elsif KEY2 = '1' => 
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif op_modes = "1000" =>
+                elsif KEY3 = '1' =>
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "10"; -- 1000Hz
                     fstate     <= HZ1000;
@@ -397,14 +471,14 @@ BEGIN
             when HZ1000 =>
             
                 selectPWM <= "10";
-            
-                if op_modes = "0001" =>
+                fstate <= HZ1000;
+                if    KEY0 = '1' =>
                     selectMode <= "00" --Init Mode
                     fstate     <= INIT;
-                elsif op_modes = "0100" => 
+                elsif KEY2 = '1' => 
                     selectMode <= "01"; --Test Mode
                     fstate     <= TEST;
-                elsif op_modes = "1000" =>
+                elsif KEY3 = '1' =>
                     selectMode <= "11"; --PWM Mode
                     selectPWM  <= "00"; --60Hz
                     fstate     <= HZ60;
